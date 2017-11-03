@@ -7,6 +7,7 @@ package com.testallservicesforvcs.adventureworks2014.controller;
 
 
 import java.sql.Date;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
@@ -52,9 +54,9 @@ public class EmployeeDepartmentHistoryController {
 	private EmployeeDepartmentHistoryService employeeDepartmentHistoryService;
 
 	@ApiOperation(value = "Creates a new EmployeeDepartmentHistory instance.")
-	@RequestMapping(method = RequestMethod.POST)
+@RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	public EmployeeDepartmentHistory createEmployeeDepartmentHistory(@RequestBody EmployeeDepartmentHistory employeeDepartmentHistory) {
+public EmployeeDepartmentHistory createEmployeeDepartmentHistory(@RequestBody EmployeeDepartmentHistory employeeDepartmentHistory) {
 		LOGGER.debug("Create EmployeeDepartmentHistory with information: {}" , employeeDepartmentHistory);
 
 		employeeDepartmentHistory = employeeDepartmentHistoryService.create(employeeDepartmentHistory);
@@ -63,7 +65,7 @@ public class EmployeeDepartmentHistoryController {
 	    return employeeDepartmentHistory;
 	}
 
-    @ApiOperation(value = "Returns the EmployeeDepartmentHistory instance associated with the given composite-id.")
+@ApiOperation(value = "Returns the EmployeeDepartmentHistory instance associated with the given composite-id.")
     @RequestMapping(value = "/composite-id", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
     public EmployeeDepartmentHistory getEmployeeDepartmentHistory(@RequestParam("businessEntityId") Integer businessEntityId,@RequestParam("startDate") Date startDate,@RequestParam("departmentId") Short departmentId,@RequestParam("shiftId") Short shiftId) throws EntityNotFoundException {
@@ -159,6 +161,14 @@ public class EmployeeDepartmentHistoryController {
 		LOGGER.debug("counting EmployeeDepartmentHistories");
 		return employeeDepartmentHistoryService.count(query);
 	}
+
+    @ApiOperation(value = "Returns aggregated result with given aggregation info")
+	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+	public Page<Map<String, Object>> getEmployeeDepartmentHistoryAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
+        LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
+        return employeeDepartmentHistoryService.getAggregatedValues(aggregationInfo, pageable);
+    }
 
 
     /**

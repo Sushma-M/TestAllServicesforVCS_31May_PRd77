@@ -7,7 +7,6 @@ package com.hrdb;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,6 +14,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,10 +50,10 @@ public class Employee implements Serializable {
     private String role;
     private Integer managerId;
     private Integer tenantId;
+    private List<Vacation> vacations;
     private Department department;
     private Employee employeeByManagerId;
-    private List<Employee> employeesForManagerId = new ArrayList<>();
-    private List<Vacation> vacations = new ArrayList<>();
+    private List<Employee> employeesForManagerId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -201,8 +201,18 @@ public class Employee implements Serializable {
         this.tenantId = tenantId;
     }
 
+    @JsonInclude(Include.NON_EMPTY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
+    public List<Vacation> getVacations() {
+        return this.vacations;
+    }
+
+    public void setVacations(List<Vacation> vacations) {
+        this.vacations = vacations;
+    }
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "`DEPT_ID`", referencedColumnName = "`DEPT_ID`", insertable = false, updatable = false)
+    @JoinColumn(name = "`DEPT_ID`", referencedColumnName = "`DEPT_ID`", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "`DEPTFKEY`"))
     public Department getDepartment() {
         return this.department;
     }
@@ -218,7 +228,7 @@ public class Employee implements Serializable {
     // ignoring self relation properties to avoid circular loops.
     @JsonIgnoreProperties({"employeeByManagerId", "employeesForManagerId"})
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "`MANAGER_ID`", referencedColumnName = "`EMP_ID`", insertable = false, updatable = false)
+    @JoinColumn(name = "`MANAGER_ID`", referencedColumnName = "`EMP_ID`", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "`MGRFKEY`"))
     public Employee getEmployeeByManagerId() {
         return this.employeeByManagerId;
     }
@@ -241,16 +251,6 @@ public class Employee implements Serializable {
 
     public void setEmployeesForManagerId(List<Employee> employeesForManagerId) {
         this.employeesForManagerId = employeesForManagerId;
-    }
-
-    @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
-    public List<Vacation> getVacations() {
-        return this.vacations;
-    }
-
-    public void setVacations(List<Vacation> vacations) {
-        this.vacations = vacations;
     }
 
     @Override

@@ -7,6 +7,7 @@ package com.testallservicesforvcs.adventureworks2014.controller;
 
 
 import java.sql.Date;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
@@ -52,9 +54,9 @@ public class VemployeeDepartmentHistoryController {
 	private VemployeeDepartmentHistoryService vemployeeDepartmentHistoryService;
 
 	@ApiOperation(value = "Creates a new VemployeeDepartmentHistory instance.")
-	@RequestMapping(method = RequestMethod.POST)
+@RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	public VemployeeDepartmentHistory createVemployeeDepartmentHistory(@RequestBody VemployeeDepartmentHistory vemployeeDepartmentHistory) {
+public VemployeeDepartmentHistory createVemployeeDepartmentHistory(@RequestBody VemployeeDepartmentHistory vemployeeDepartmentHistory) {
 		LOGGER.debug("Create VemployeeDepartmentHistory with information: {}" , vemployeeDepartmentHistory);
 
 		vemployeeDepartmentHistory = vemployeeDepartmentHistoryService.create(vemployeeDepartmentHistory);
@@ -63,7 +65,7 @@ public class VemployeeDepartmentHistoryController {
 	    return vemployeeDepartmentHistory;
 	}
 
-    @ApiOperation(value = "Returns the VemployeeDepartmentHistory instance associated with the given composite-id.")
+@ApiOperation(value = "Returns the VemployeeDepartmentHistory instance associated with the given composite-id.")
     @RequestMapping(value = "/composite-id", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
     public VemployeeDepartmentHistory getVemployeeDepartmentHistory(@RequestParam("businessEntityId") Integer businessEntityId,@RequestParam("title") String title,@RequestParam("firstName") String firstName,@RequestParam("middleName") String middleName,@RequestParam("lastName") String lastName,@RequestParam("suffix") String suffix,@RequestParam("shift") String shift,@RequestParam("department") String department,@RequestParam("groupName") String groupName,@RequestParam("startDate") Date startDate,@RequestParam("endDate") Date endDate) throws EntityNotFoundException {
@@ -180,6 +182,14 @@ public class VemployeeDepartmentHistoryController {
 		LOGGER.debug("counting VemployeeDepartmentHistories");
 		return vemployeeDepartmentHistoryService.count(query);
 	}
+
+    @ApiOperation(value = "Returns aggregated result with given aggregation info")
+	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+	public Page<Map<String, Object>> getVemployeeDepartmentHistoryAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
+        LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
+        return vemployeeDepartmentHistoryService.getAggregatedValues(aggregationInfo, pageable);
+    }
 
 
     /**

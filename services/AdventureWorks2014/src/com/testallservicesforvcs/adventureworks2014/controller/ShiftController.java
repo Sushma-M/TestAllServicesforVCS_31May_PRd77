@@ -7,6 +7,7 @@ package com.testallservicesforvcs.adventureworks2014.controller;
 
 
 import java.sql.Time;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
@@ -52,9 +54,9 @@ public class ShiftController {
 	private ShiftService shiftService;
 
 	@ApiOperation(value = "Creates a new Shift instance.")
-	@RequestMapping(method = RequestMethod.POST)
+@RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	public Shift createShift(@RequestBody Shift shift) {
+public Shift createShift(@RequestBody Shift shift) {
 		LOGGER.debug("Create Shift with information: {}" , shift);
 
 		shift = shiftService.create(shift);
@@ -62,7 +64,6 @@ public class ShiftController {
 
 	    return shift;
 	}
-
 
     @ApiOperation(value = "Returns the Shift instance associated with the given id.")
     @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
@@ -99,18 +100,21 @@ public class ShiftController {
 
         return deletedShift != null;
     }
-    @RequestMapping(value = "/name/{name}", method = RequestMethod.GET)
-    @ApiOperation(value = "Returns the matching Shift with given unique key values.")
-    public Shift getByName(@PathVariable("name") String name) {
-        LOGGER.debug("Getting Shift with uniques key Name");
-        return shiftService.getByName(name);
-    }
 
     @RequestMapping(value = "/startTime-endTime", method = RequestMethod.GET)
     @ApiOperation(value = "Returns the matching Shift with given unique key values.")
-    public Shift getByStartTimeAndEndTime(@RequestParam(name = "startTime") Time startTime, @RequestParam(name = "endTime") Time endTime) {
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public Shift getByStartTimeAndEndTime(@RequestParam("startTime") Time startTime, @RequestParam("endTime") Time endTime) {
         LOGGER.debug("Getting Shift with uniques key StartTimeAndEndTime");
         return shiftService.getByStartTimeAndEndTime(startTime, endTime);
+    }
+
+    @RequestMapping(value = "/name/{name}", method = RequestMethod.GET)
+    @ApiOperation(value = "Returns the matching Shift with given unique key values.")
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public Shift getByName(@PathVariable("name") String name) {
+        LOGGER.debug("Getting Shift with uniques key Name");
+        return shiftService.getByName(name);
     }
 
     /**
@@ -155,6 +159,14 @@ public class ShiftController {
 		LOGGER.debug("counting Shifts");
 		return shiftService.count(query);
 	}
+
+    @ApiOperation(value = "Returns aggregated result with given aggregation info")
+	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+	public Page<Map<String, Object>> getShiftAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
+        LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
+        return shiftService.getAggregatedValues(aggregationInfo, pageable);
+    }
 
     @RequestMapping(value="/{id:.+}/employeeDepartmentHistories", method=RequestMethod.GET)
     @ApiOperation(value = "Gets the employeeDepartmentHistories instance associated with the given id.")

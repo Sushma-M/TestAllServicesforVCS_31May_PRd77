@@ -12,15 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import com.wavemaker.runtime.data.dao.WMGenericDao;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 
 import com.testallservicesforvcs.adventureworks2014.Employee;
@@ -35,21 +38,25 @@ import com.testallservicesforvcs.adventureworks2014.JobCandidate;
  * @see Employee
  */
 @Service("AdventureWorks2014.EmployeeService")
+@Validated
 public class EmployeeServiceImpl implements EmployeeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
+    @Lazy
     @Autowired
 	@Qualifier("AdventureWorks2014.EmployeePayHistoryService")
 	private EmployeePayHistoryService employeePayHistoryService;
 
-    @Autowired
-	@Qualifier("AdventureWorks2014.EmployeeDepartmentHistoryService")
-	private EmployeeDepartmentHistoryService employeeDepartmentHistoryService;
-
+    @Lazy
     @Autowired
 	@Qualifier("AdventureWorks2014.JobCandidateService")
 	private JobCandidateService jobCandidateService;
+
+    @Lazy
+    @Autowired
+	@Qualifier("AdventureWorks2014.EmployeeDepartmentHistoryService")
+	private EmployeeDepartmentHistoryService employeeDepartmentHistoryService;
 
     @Autowired
     @Qualifier("AdventureWorks2014.EmployeeDao")
@@ -128,23 +135,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
     @Override
-    public Employee getByNationalIdnumber(String nationalIdnumber) {
-        Map<String, Object> nationalIdnumberMap = new HashMap<>();
-        nationalIdnumberMap.put("nationalIdnumber", nationalIdnumber);
-
-        LOGGER.debug("Finding Employee by unique keys: {}", nationalIdnumberMap);
-        Employee employee = this.wmGenericDao.findByUniqueKey(nationalIdnumberMap);
-
-        if (employee == null){
-            LOGGER.debug("No Employee found with given unique key values: {}", nationalIdnumberMap);
-            throw new EntityNotFoundException(String.valueOf(nationalIdnumberMap));
-        }
-
-        return employee;
-    }
-
-    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
-    @Override
     public Employee getByRowguid(String rowguid) {
         Map<String, Object> rowguidMap = new HashMap<>();
         rowguidMap.put("rowguid", rowguid);
@@ -155,6 +145,23 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee == null){
             LOGGER.debug("No Employee found with given unique key values: {}", rowguidMap);
             throw new EntityNotFoundException(String.valueOf(rowguidMap));
+        }
+
+        return employee;
+    }
+
+    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
+    @Override
+    public Employee getByNationalIdnumber(String nationalIdnumber) {
+        Map<String, Object> nationalIdnumberMap = new HashMap<>();
+        nationalIdnumberMap.put("nationalIdnumber", nationalIdnumber);
+
+        LOGGER.debug("Finding Employee by unique keys: {}", nationalIdnumberMap);
+        Employee employee = this.wmGenericDao.findByUniqueKey(nationalIdnumberMap);
+
+        if (employee == null){
+            LOGGER.debug("No Employee found with given unique key values: {}", nationalIdnumberMap);
+            throw new EntityNotFoundException(String.valueOf(nationalIdnumberMap));
         }
 
         return employee;
@@ -212,6 +219,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
+	@Override
+    public Page<Map<String, Object>> getAggregatedValues(AggregationInfo aggregationInfo, Pageable pageable) {
+        return this.wmGenericDao.getAggregatedValues(aggregationInfo, pageable);
+    }
+
+    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
     @Override
     public Page<EmployeeDepartmentHistory> findAssociatedEmployeeDepartmentHistories(Integer businessEntityId, Pageable pageable) {
         LOGGER.debug("Fetching all associated employeeDepartmentHistories");
@@ -256,19 +269,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
 	 * This setter method should only be used by unit tests
 	 *
-	 * @param service EmployeeDepartmentHistoryService instance
+	 * @param service JobCandidateService instance
 	 */
-	protected void setEmployeeDepartmentHistoryService(EmployeeDepartmentHistoryService service) {
-        this.employeeDepartmentHistoryService = service;
+	protected void setJobCandidateService(JobCandidateService service) {
+        this.jobCandidateService = service;
     }
 
     /**
 	 * This setter method should only be used by unit tests
 	 *
-	 * @param service JobCandidateService instance
+	 * @param service EmployeeDepartmentHistoryService instance
 	 */
-	protected void setJobCandidateService(JobCandidateService service) {
-        this.jobCandidateService = service;
+	protected void setEmployeeDepartmentHistoryService(EmployeeDepartmentHistoryService service) {
+        this.employeeDepartmentHistoryService = service;
     }
 
 }

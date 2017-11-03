@@ -13,15 +13,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import com.wavemaker.runtime.data.dao.WMGenericDao;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 
 import com.testallservicesforvcs.adventureworks2014.EmployeeDepartmentHistory;
@@ -34,10 +37,12 @@ import com.testallservicesforvcs.adventureworks2014.Shift;
  * @see Shift
  */
 @Service("AdventureWorks2014.ShiftService")
+@Validated
 public class ShiftServiceImpl implements ShiftService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftServiceImpl.class);
 
+    @Lazy
     @Autowired
 	@Qualifier("AdventureWorks2014.EmployeeDepartmentHistoryService")
 	private EmployeeDepartmentHistoryService employeeDepartmentHistoryService;
@@ -86,23 +91,6 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
     @Override
-    public Shift getByName(String name) {
-        Map<String, Object> nameMap = new HashMap<>();
-        nameMap.put("name", name);
-
-        LOGGER.debug("Finding Shift by unique keys: {}", nameMap);
-        Shift shift = this.wmGenericDao.findByUniqueKey(nameMap);
-
-        if (shift == null){
-            LOGGER.debug("No Shift found with given unique key values: {}", nameMap);
-            throw new EntityNotFoundException(String.valueOf(nameMap));
-        }
-
-        return shift;
-    }
-
-    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
-    @Override
     public Shift getByStartTimeAndEndTime(Time startTime, Time endTime) {
         Map<String, Object> startTimeAndEndTimeMap = new HashMap<>();
         startTimeAndEndTimeMap.put("startTime", startTime);
@@ -114,6 +102,23 @@ public class ShiftServiceImpl implements ShiftService {
         if (shift == null){
             LOGGER.debug("No Shift found with given unique key values: {}", startTimeAndEndTimeMap);
             throw new EntityNotFoundException(String.valueOf(startTimeAndEndTimeMap));
+        }
+
+        return shift;
+    }
+
+    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
+    @Override
+    public Shift getByName(String name) {
+        Map<String, Object> nameMap = new HashMap<>();
+        nameMap.put("name", name);
+
+        LOGGER.debug("Finding Shift by unique keys: {}", nameMap);
+        Shift shift = this.wmGenericDao.findByUniqueKey(nameMap);
+
+        if (shift == null){
+            LOGGER.debug("No Shift found with given unique key values: {}", nameMap);
+            throw new EntityNotFoundException(String.valueOf(nameMap));
         }
 
         return shift;
@@ -168,6 +173,12 @@ public class ShiftServiceImpl implements ShiftService {
 	@Override
 	public long count(String query) {
         return this.wmGenericDao.count(query);
+    }
+
+    @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
+	@Override
+    public Page<Map<String, Object>> getAggregatedValues(AggregationInfo aggregationInfo, Pageable pageable) {
+        return this.wmGenericDao.getAggregatedValues(aggregationInfo, pageable);
     }
 
     @Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")

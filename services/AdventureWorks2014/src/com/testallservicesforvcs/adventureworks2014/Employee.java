@@ -7,7 +7,6 @@ package com.testallservicesforvcs.adventureworks2014;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,9 +32,9 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  */
 @Entity
 @Table(name = "`Employee`", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"`LoginID`"}),
-        @UniqueConstraint(columnNames = {"`NationalIDNumber`"}),
-        @UniqueConstraint(columnNames = {"`rowguid`"})})
+        @UniqueConstraint(name = "`UK_550s85r2wnakc17q5diuit3q5`", columnNames = {"`LoginID`"}),
+        @UniqueConstraint(name = "`UK_ktpwii8so9uy1t5iwicaj002j`", columnNames = {"`NationalIDNumber`"}),
+        @UniqueConstraint(name = "`UK_36c8yp0q8ry0y2acrd50qjkt`", columnNames = {"`rowguid`"})})
 public class Employee implements Serializable {
 
     private Integer businessEntityId;
@@ -56,9 +55,9 @@ public class Employee implements Serializable {
     private String rowguid;
     @Type(type = "DateTime")
     private LocalDateTime modifiedDate;
-    private List<EmployeeDepartmentHistory> employeeDepartmentHistories = new ArrayList<>();
-    private List<EmployeePayHistory> employeePayHistories = new ArrayList<>();
-    private List<JobCandidate> jobCandidates = new ArrayList<>();
+    private List<EmployeeDepartmentHistory> employeeDepartmentHistories;
+    private List<EmployeePayHistory> employeePayHistories;
+    private List<JobCandidate> jobCandidates;
 
     @Id
     @Column(name = "`BusinessEntityID`", nullable = false, scale = 0, precision = 10)

@@ -7,6 +7,7 @@ package com.testallservicesforvcs.adventureworks2014.controller;
 
 
 import java.sql.Date;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wavemaker.runtime.data.exception.EntityNotFoundException;
 import com.wavemaker.runtime.data.export.ExportType;
 import com.wavemaker.runtime.data.expression.QueryFilter;
+import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.model.Downloadable;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
@@ -52,9 +54,9 @@ public class VemployeeDepartmentController {
 	private VemployeeDepartmentService vemployeeDepartmentService;
 
 	@ApiOperation(value = "Creates a new VemployeeDepartment instance.")
-	@RequestMapping(method = RequestMethod.POST)
+@RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	public VemployeeDepartment createVemployeeDepartment(@RequestBody VemployeeDepartment vemployeeDepartment) {
+public VemployeeDepartment createVemployeeDepartment(@RequestBody VemployeeDepartment vemployeeDepartment) {
 		LOGGER.debug("Create VemployeeDepartment with information: {}" , vemployeeDepartment);
 
 		vemployeeDepartment = vemployeeDepartmentService.create(vemployeeDepartment);
@@ -63,7 +65,7 @@ public class VemployeeDepartmentController {
 	    return vemployeeDepartment;
 	}
 
-    @ApiOperation(value = "Returns the VemployeeDepartment instance associated with the given composite-id.")
+@ApiOperation(value = "Returns the VemployeeDepartment instance associated with the given composite-id.")
     @RequestMapping(value = "/composite-id", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
     public VemployeeDepartment getVemployeeDepartment(@RequestParam("businessEntityId") Integer businessEntityId,@RequestParam("title") String title,@RequestParam("firstName") String firstName,@RequestParam("middleName") String middleName,@RequestParam("lastName") String lastName,@RequestParam("suffix") String suffix,@RequestParam("jobTitle") String jobTitle,@RequestParam("department") String department,@RequestParam("groupName") String groupName,@RequestParam("startDate") Date startDate) throws EntityNotFoundException {
@@ -177,6 +179,14 @@ public class VemployeeDepartmentController {
 		LOGGER.debug("counting VemployeeDepartments");
 		return vemployeeDepartmentService.count(query);
 	}
+
+    @ApiOperation(value = "Returns aggregated result with given aggregation info")
+	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+	public Page<Map<String, Object>> getVemployeeDepartmentAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
+        LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
+        return vemployeeDepartmentService.getAggregatedValues(aggregationInfo, pageable);
+    }
 
 
     /**

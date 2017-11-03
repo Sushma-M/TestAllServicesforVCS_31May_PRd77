@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd" xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <bean class="org.springframework.security.web.FilterChainProxy" id="wmCompositeSecurityFilter">
+        <constructor-arg>
+            <security:filter-chain pattern="/**" filters="sslSecureFilter, wmXSSFilter, wmXFrameOptionsFilter, wmXContentTypeOptionsFilter,corsFilter"/>
+        </constructor-arg>
+    </bean>
+    <bean class="com.wavemaker.runtime.cors.CorsBeanPostProcessor" id="corsBeanPostProcessor"/>
+    <bean class="org.springframework.web.cors.UrlBasedCorsConfigurationSource" id="corsConfigurationSource"/>
+    <bean class="org.springframework.web.filter.CorsFilter" id="corsFilter">
+        <constructor-arg ref="corsConfigurationSource"/>
+    </bean>
     <bean class="com.wavemaker.runtime.security.SecurityService" id="securityService"/>
     <bean class="com.wavemaker.runtime.security.controller.SecurityController" id="securityController"/>
     <bean class="com.wavemaker.runtime.web.filter.SSLSecureFilter" id="sslSecureFilter"/>
@@ -59,6 +69,7 @@
         <security:intercept-url pattern="/j_spring_security_logout" access="permitAll"/>
         <security:intercept-url pattern="/services/prefabs/**/servicedefs" access="permitAll"/>
         <security:intercept-url pattern="/services/security/**" access="permitAll"/>
+        <security:intercept-url pattern="/services/application/i18n/**" access="permitAll"/>
         <security:intercept-url pattern="/services/servicedefs" access="permitAll"/>
         <security:intercept-url pattern="/" access="isAuthenticated()"/>
         <security:intercept-url pattern="/**" access="isAuthenticated()"/>
@@ -182,14 +193,11 @@
         <property name="filterProcessesUrl" value="/j_spring_security_check"/>
         <property name="usernameParameter" value="j_username"/>
         <property name="passwordParameter" value="j_password"/>
-        <property name="authenticationDetailsSource" ref="WMWebAuthenticationDetailsSource"/>
         <property name="rememberMeServices" ref="rememberMeServices"/>
     </bean>
     <bean class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter" id="WMBasicAuthenticationFilter">
         <constructor-arg ref="authenticationManager"/>
-        <property name="authenticationDetailsSource" ref="WMWebAuthenticationDetailsSource"/>
     </bean>
-    <bean class="com.wavemaker.runtime.security.WMWebAuthenticationDetailsSource" id="WMWebAuthenticationDetailsSource"/>
     <bean class="com.wavemaker.runtime.security.WMAuthenticationEntryPoint" id="WMSecAuthEntryPoint">
         <constructor-arg value="/index.html"/>
     </bean>
@@ -230,11 +238,21 @@
         <property name="parameter" value="${general.tokenService.parameter}"/>
         <property name="tokenValiditySeconds" value="${general.tokenService.tokenValiditySeconds}"/>
     </bean>
-    <bean class="com.wavemaker.runtime.security.filter.WMXFrameOptionsHeaderFilter" id="wmXFrameOptionsFilter"/>
+    <bean class="com.wavemaker.runtime.security.filter.WMXFrameOptionsHeaderFilter" id="wmXFrameOptionsFilter">
+        <property name="xFrameOptionsMode" value="SAMEORIGIN"/>
+    </bean>
     <bean class="com.wavemaker.runtime.security.filter.WMXContentTypeOptionsFilter" id="wmXContentTypeOptionsFilter"/>
-    <bean class="org.springframework.security.web.FilterChainProxy" id="wmCompositeSecurityFilter">
-        <constructor-arg>
-            <security:filter-chain pattern="/**" filters="sslSecureFilter, wmXSSFilter, wmXFrameOptionsFilter, wmXContentTypeOptionsFilter"/>
-        </constructor-arg>
+    <bean class="com.wavemaker.commons.model.security.CorsConfig" id="corsConfig">
+        <property name="enabled" value="${general.cors.enabled}"/>
+        <property name="maxAge" value="${general.cors.maxAge}"/>
+        <property name="pathEntries">
+            <list>
+                <bean class="com.wavemaker.commons.model.security.PathEntry" id="root">
+                    <property name="name" value="root"/>
+                    <property name="path" value="/**"/>
+                    <property name="allowedOrigins" value="${general.cors.root.allowedOrigins}"/>
+                </bean>
+            </list>
+        </property>
     </bean>
 </beans>
