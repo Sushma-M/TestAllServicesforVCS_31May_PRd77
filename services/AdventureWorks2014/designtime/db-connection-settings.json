@@ -30,6 +30,9 @@
     "table" : "Shift",
     "schema" : "HumanResources"
   }, {
+    "table" : "TABLE13",
+    "schema" : "HumanResources"
+  }, {
     "table" : "vEmployee",
     "schema" : "HumanResources"
   }, {
