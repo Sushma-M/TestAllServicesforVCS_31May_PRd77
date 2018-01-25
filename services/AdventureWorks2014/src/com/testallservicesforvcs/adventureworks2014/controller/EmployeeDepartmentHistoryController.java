@@ -54,9 +54,9 @@ public class EmployeeDepartmentHistoryController {
 	private EmployeeDepartmentHistoryService employeeDepartmentHistoryService;
 
 	@ApiOperation(value = "Creates a new EmployeeDepartmentHistory instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public EmployeeDepartmentHistory createEmployeeDepartmentHistory(@RequestBody EmployeeDepartmentHistory employeeDepartmentHistory) {
+    public EmployeeDepartmentHistory createEmployeeDepartmentHistory(@RequestBody EmployeeDepartmentHistory employeeDepartmentHistory) {
 		LOGGER.debug("Create EmployeeDepartmentHistory with information: {}" , employeeDepartmentHistory);
 
 		employeeDepartmentHistory = employeeDepartmentHistoryService.create(employeeDepartmentHistory);

@@ -51,8 +51,7 @@ public class JobCandidateServiceImpl implements JobCandidateService {
     @Override
 	public JobCandidate create(JobCandidate jobCandidate) {
         LOGGER.debug("Creating a new JobCandidate with information: {}", jobCandidate);
-        JobCandidate jobCandidateCreated = this.wmGenericDao.create(jobCandidate);
-        return jobCandidateCreated;
+        return this.wmGenericDao.create(jobCandidate);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -79,6 +78,8 @@ public class JobCandidateServiceImpl implements JobCandidateService {
 	@Override
 	public JobCandidate update(JobCandidate jobCandidate) throws EntityNotFoundException {
         LOGGER.debug("Updating JobCandidate with information: {}", jobCandidate);
+
+
         this.wmGenericDao.update(jobCandidate);
 
         Integer jobcandidateId = jobCandidate.getJobCandidateId();

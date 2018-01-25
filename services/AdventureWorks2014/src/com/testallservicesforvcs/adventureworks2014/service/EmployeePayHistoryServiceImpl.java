@@ -52,8 +52,7 @@ public class EmployeePayHistoryServiceImpl implements EmployeePayHistoryService 
     @Override
 	public EmployeePayHistory create(EmployeePayHistory employeePayHistory) {
         LOGGER.debug("Creating a new EmployeePayHistory with information: {}", employeePayHistory);
-        EmployeePayHistory employeePayHistoryCreated = this.wmGenericDao.create(employeePayHistory);
-        return employeePayHistoryCreated;
+        return this.wmGenericDao.create(employeePayHistory);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -80,6 +79,8 @@ public class EmployeePayHistoryServiceImpl implements EmployeePayHistoryService 
 	@Override
 	public EmployeePayHistory update(EmployeePayHistory employeePayHistory) throws EntityNotFoundException {
         LOGGER.debug("Updating EmployeePayHistory with information: {}", employeePayHistory);
+
+
         this.wmGenericDao.update(employeePayHistory);
 
         EmployeePayHistoryId employeepayhistoryId = new EmployeePayHistoryId();

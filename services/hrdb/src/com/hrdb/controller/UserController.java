@@ -52,9 +52,9 @@ public class UserController {
 	private UserService userService;
 
 	@ApiOperation(value = "Creates a new User instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public User createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user) {
 		LOGGER.debug("Create User with information: {}" , user);
 
 		user = userService.create(user);

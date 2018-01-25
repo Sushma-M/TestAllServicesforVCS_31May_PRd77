@@ -58,15 +58,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
 	public Department create(Department department) {
         LOGGER.debug("Creating a new Department with information: {}", department);
-        Department departmentCreated = this.wmGenericDao.create(department);
-        if(departmentCreated.getEmployeeDepartmentHistories() != null) {
-            for(EmployeeDepartmentHistory employeeDepartmentHistorie : departmentCreated.getEmployeeDepartmentHistories()) {
-                employeeDepartmentHistorie.setDepartment(departmentCreated);
-                LOGGER.debug("Creating a new child EmployeeDepartmentHistory with information: {}", employeeDepartmentHistorie);
-                employeeDepartmentHistoryService.create(employeeDepartmentHistorie);
-            }
-        }
-        return departmentCreated;
+        return this.wmGenericDao.create(department);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -109,6 +101,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 	@Override
 	public Department update(Department department) throws EntityNotFoundException {
         LOGGER.debug("Updating Department with information: {}", department);
+
+        if(department.getEmployeeDepartmentHistories() != null) {
+            for(EmployeeDepartmentHistory _employeeDepartmentHistory : department.getEmployeeDepartmentHistories()) {
+                _employeeDepartmentHistory.setDepartment(department);
+            }
+        }
+
         this.wmGenericDao.update(department);
 
         Short departmentIdInstance = department.getDepartmentId();

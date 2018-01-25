@@ -5,5 +5,10 @@
   "connectionTimeout" : 10000,
   "requestTimeout" : 10000,
   "soapActionURI" : null,
-  "httpHeaders" : { }
+  "httpHeaders" : { },
+  "packageName" : "com.testallservicesforvcs.services.countryinfoservice",
+  "wsdlLocation" : "",
+  "wsdlSource" : "FILE",
+  "bindingsFile" : "",
+  "wsdlFile" : "CountryInfoService.wsdl"
 }

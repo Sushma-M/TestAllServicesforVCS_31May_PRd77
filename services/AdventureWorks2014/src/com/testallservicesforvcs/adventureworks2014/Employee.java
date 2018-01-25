@@ -7,6 +7,7 @@ package com.testallservicesforvcs.adventureworks2014;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,11 +17,11 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Type;
-import org.joda.time.LocalDateTime;
+import org.hibernate.annotations.Cascade;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -32,9 +33,9 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  */
 @Entity
 @Table(name = "`Employee`", uniqueConstraints = {
-        @UniqueConstraint(name = "`UK_550s85r2wnakc17q5diuit3q5`", columnNames = {"`LoginID`"}),
-        @UniqueConstraint(name = "`UK_ktpwii8so9uy1t5iwicaj002j`", columnNames = {"`NationalIDNumber`"}),
-        @UniqueConstraint(name = "`UK_36c8yp0q8ry0y2acrd50qjkt`", columnNames = {"`rowguid`"})})
+            @UniqueConstraint(name = "`UK_550s85r2wnakc17q5diuit3q5`", columnNames = {"`LoginID`"}),
+            @UniqueConstraint(name = "`UK_36c8yp0q8ry0y2acrd50qjkt`", columnNames = {"`rowguid`"}),
+            @UniqueConstraint(name = "`UK_ktpwii8so9uy1t5iwicaj002j`", columnNames = {"`NationalIDNumber`"})})
 public class Employee implements Serializable {
 
     private Integer businessEntityId;
@@ -53,7 +54,6 @@ public class Employee implements Serializable {
     private short sickLeaveHours;
     private boolean currentFlag;
     private String rowguid;
-    @Type(type = "DateTime")
     private LocalDateTime modifiedDate;
     private List<EmployeeDepartmentHistory> employeeDepartmentHistories;
     private List<EmployeePayHistory> employeePayHistories;
@@ -205,7 +205,8 @@ public class Employee implements Serializable {
     }
 
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "employee")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<EmployeeDepartmentHistory> getEmployeeDepartmentHistories() {
         return this.employeeDepartmentHistories;
     }
@@ -215,7 +216,8 @@ public class Employee implements Serializable {
     }
 
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "employee")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<EmployeePayHistory> getEmployeePayHistories() {
         return this.employeePayHistories;
     }
@@ -225,13 +227,33 @@ public class Employee implements Serializable {
     }
 
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "employee")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<JobCandidate> getJobCandidates() {
         return this.jobCandidates;
     }
 
     public void setJobCandidates(List<JobCandidate> jobCandidates) {
         this.jobCandidates = jobCandidates;
+    }
+
+    @PostPersist
+    public void onPostPersist() {
+        if(employeeDepartmentHistories != null) {
+            for(EmployeeDepartmentHistory employeeDepartmentHistory : employeeDepartmentHistories) {
+                employeeDepartmentHistory.setEmployee(this);
+            }
+        }
+        if(employeePayHistories != null) {
+            for(EmployeePayHistory employeePayHistory : employeePayHistories) {
+                employeePayHistory.setEmployee(this);
+            }
+        }
+        if(jobCandidates != null) {
+            for(JobCandidate jobCandidate : jobCandidates) {
+                jobCandidate.setEmployee(this);
+            }
+        }
     }
 
     @Override

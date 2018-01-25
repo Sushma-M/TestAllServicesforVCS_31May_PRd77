@@ -51,8 +51,7 @@ public class VacationServiceImpl implements VacationService {
     @Override
 	public Vacation create(Vacation vacation) {
         LOGGER.debug("Creating a new Vacation with information: {}", vacation);
-        Vacation vacationCreated = this.wmGenericDao.create(vacation);
-        return vacationCreated;
+        return this.wmGenericDao.create(vacation);
     }
 
 	@Transactional(readOnly = true, value = "hrdbTransactionManager")
@@ -79,6 +78,8 @@ public class VacationServiceImpl implements VacationService {
 	@Override
 	public Vacation update(Vacation vacation) throws EntityNotFoundException {
         LOGGER.debug("Updating Vacation with information: {}", vacation);
+
+
         this.wmGenericDao.update(vacation);
 
         Integer vacationId = vacation.getId();

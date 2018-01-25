@@ -57,23 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
 	public Employee create(Employee employee) {
         LOGGER.debug("Creating a new Employee with information: {}", employee);
-        Employee employeeCreated = this.wmGenericDao.create(employee);
-        if(employeeCreated.getVacations() != null) {
-            for(Vacation vacation : employeeCreated.getVacations()) {
-                vacation.setEmployee(employeeCreated);
-                LOGGER.debug("Creating a new child Vacation with information: {}", vacation);
-                vacationService.create(vacation);
-            }
-        }
-
-        if(employeeCreated.getEmployeesForManagerId() != null) {
-            for(Employee employeesForManagerId : employeeCreated.getEmployeesForManagerId()) {
-                employeesForManagerId.setEmployeeByManagerId(employeeCreated);
-                LOGGER.debug("Creating a new child Employee with information: {}", employeesForManagerId);
-                create(employeesForManagerId);
-            }
-        }
-        return employeeCreated;
+        return this.wmGenericDao.create(employee);
     }
 
 	@Transactional(readOnly = true, value = "hrdbTransactionManager")
@@ -100,6 +84,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Employee update(Employee employee) throws EntityNotFoundException {
         LOGGER.debug("Updating Employee with information: {}", employee);
+
+        if(employee.getVacations() != null) {
+            for(Vacation _vacation : employee.getVacations()) {
+                _vacation.setEmployee(employee);
+            }
+        }
+        if(employee.getEmployeesForManagerId() != null) {
+            for(Employee _employee : employee.getEmployeesForManagerId()) {
+                _employee.setEmployeeByManagerId(employee);
+            }
+        }
+
         this.wmGenericDao.update(employee);
 
         Integer employeeId = employee.getEmpId();

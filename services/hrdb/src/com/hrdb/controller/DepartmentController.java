@@ -53,9 +53,9 @@ public class DepartmentController {
 	private DepartmentService departmentService;
 
 	@ApiOperation(value = "Creates a new Department instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Department createDepartment(@RequestBody Department department) {
+    public Department createDepartment(@RequestBody Department department) {
 		LOGGER.debug("Create Department with information: {}" , department);
 
 		department = departmentService.create(department);

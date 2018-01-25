@@ -52,8 +52,7 @@ public class VemployeeDepartmentServiceImpl implements VemployeeDepartmentServic
     @Override
 	public VemployeeDepartment create(VemployeeDepartment vemployeeDepartment) {
         LOGGER.debug("Creating a new VemployeeDepartment with information: {}", vemployeeDepartment);
-        VemployeeDepartment vemployeeDepartmentCreated = this.wmGenericDao.create(vemployeeDepartment);
-        return vemployeeDepartmentCreated;
+        return this.wmGenericDao.create(vemployeeDepartment);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -80,6 +79,8 @@ public class VemployeeDepartmentServiceImpl implements VemployeeDepartmentServic
 	@Override
 	public VemployeeDepartment update(VemployeeDepartment vemployeeDepartment) throws EntityNotFoundException {
         LOGGER.debug("Updating VemployeeDepartment with information: {}", vemployeeDepartment);
+
+
         this.wmGenericDao.update(vemployeeDepartment);
 
         VemployeeDepartmentId vemployeedepartmentId = new VemployeeDepartmentId();

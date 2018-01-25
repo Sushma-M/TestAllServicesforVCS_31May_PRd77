@@ -21,7 +21,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -202,7 +205,8 @@ public class Employee implements Serializable {
     }
 
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employee")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "employee")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<Vacation> getVacations() {
         return this.vacations;
     }
@@ -244,13 +248,28 @@ public class Employee implements Serializable {
     // ignoring self relation properties to avoid circular loops.
     @JsonIgnoreProperties({"employeeByManagerId", "employeesForManagerId"})
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "employeeByManagerId")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "employeeByManagerId")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<Employee> getEmployeesForManagerId() {
         return this.employeesForManagerId;
     }
 
     public void setEmployeesForManagerId(List<Employee> employeesForManagerId) {
         this.employeesForManagerId = employeesForManagerId;
+    }
+
+    @PostPersist
+    public void onPostPersist() {
+        if(vacations != null) {
+            for(Vacation vacation : vacations) {
+                vacation.setEmployee(this);
+            }
+        }
+        if(employeesForManagerId != null) {
+            for(Employee employee : employeesForManagerId) {
+                employee.setEmployeeByManagerId(this);
+            }
+        }
     }
 
     @Override

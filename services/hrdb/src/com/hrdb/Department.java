@@ -17,8 +17,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Cascade;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -28,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 @Entity
 @Table(name = "`DEPARTMENT`", uniqueConstraints = {
-        @UniqueConstraint(name = "`SYS_IDX_UK_DEPARTMENT_DEPT_CODE_10095`", columnNames = {"`DEPT_CODE`"})})
+            @UniqueConstraint(name = "`SYS_IDX_UK_DEPARTMENT_DEPT_CODE_10095`", columnNames = {"`DEPT_CODE`"})})
 public class Department implements Serializable {
 
     private Integer deptId;
@@ -136,13 +139,23 @@ public class Department implements Serializable {
     }
 
     @JsonInclude(Include.NON_EMPTY)
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "department")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "department")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     public List<Employee> getEmployees() {
         return this.employees;
     }
 
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
+    }
+
+    @PostPersist
+    public void onPostPersist() {
+        if(employees != null) {
+            for(Employee employee : employees) {
+                employee.setDepartment(this);
+            }
+        }
     }
 
     @Override

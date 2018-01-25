@@ -51,8 +51,7 @@ public class Table13ServiceImpl implements Table13Service {
     @Override
 	public Table13 create(Table13 table13) {
         LOGGER.debug("Creating a new Table13 with information: {}", table13);
-        Table13 table13Created = this.wmGenericDao.create(table13);
-        return table13Created;
+        return this.wmGenericDao.create(table13);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -79,6 +78,8 @@ public class Table13ServiceImpl implements Table13Service {
 	@Override
 	public Table13 update(Table13 table13) throws EntityNotFoundException {
         LOGGER.debug("Updating Table13 with information: {}", table13);
+
+
         this.wmGenericDao.update(table13);
 
         Integer table13Id = table13.getId();

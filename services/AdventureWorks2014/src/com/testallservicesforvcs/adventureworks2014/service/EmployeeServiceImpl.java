@@ -70,31 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
 	public Employee create(Employee employee) {
         LOGGER.debug("Creating a new Employee with information: {}", employee);
-        Employee employeeCreated = this.wmGenericDao.create(employee);
-        if(employeeCreated.getEmployeeDepartmentHistories() != null) {
-            for(EmployeeDepartmentHistory employeeDepartmentHistorie : employeeCreated.getEmployeeDepartmentHistories()) {
-                employeeDepartmentHistorie.setEmployee(employeeCreated);
-                LOGGER.debug("Creating a new child EmployeeDepartmentHistory with information: {}", employeeDepartmentHistorie);
-                employeeDepartmentHistoryService.create(employeeDepartmentHistorie);
-            }
-        }
-
-        if(employeeCreated.getEmployeePayHistories() != null) {
-            for(EmployeePayHistory employeePayHistorie : employeeCreated.getEmployeePayHistories()) {
-                employeePayHistorie.setEmployee(employeeCreated);
-                LOGGER.debug("Creating a new child EmployeePayHistory with information: {}", employeePayHistorie);
-                employeePayHistoryService.create(employeePayHistorie);
-            }
-        }
-
-        if(employeeCreated.getJobCandidates() != null) {
-            for(JobCandidate jobCandidate : employeeCreated.getJobCandidates()) {
-                jobCandidate.setEmployee(employeeCreated);
-                LOGGER.debug("Creating a new child JobCandidate with information: {}", jobCandidate);
-                jobCandidateService.create(jobCandidate);
-            }
-        }
-        return employeeCreated;
+        return this.wmGenericDao.create(employee);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -171,6 +147,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Employee update(Employee employee) throws EntityNotFoundException {
         LOGGER.debug("Updating Employee with information: {}", employee);
+
+        if(employee.getEmployeeDepartmentHistories() != null) {
+            for(EmployeeDepartmentHistory _employeeDepartmentHistory : employee.getEmployeeDepartmentHistories()) {
+                _employeeDepartmentHistory.setEmployee(employee);
+            }
+        }
+        if(employee.getEmployeePayHistories() != null) {
+            for(EmployeePayHistory _employeePayHistory : employee.getEmployeePayHistories()) {
+                _employeePayHistory.setEmployee(employee);
+            }
+        }
+        if(employee.getJobCandidates() != null) {
+            for(JobCandidate _jobCandidate : employee.getJobCandidates()) {
+                _jobCandidate.setEmployee(employee);
+            }
+        }
+
         this.wmGenericDao.update(employee);
 
         Integer employeeId = employee.getBusinessEntityId();

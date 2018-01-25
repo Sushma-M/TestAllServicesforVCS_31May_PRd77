@@ -25,3 +25,4 @@ src/main/webapp/wmapp/**
 src/main/webapp/wmmobile/**
 target/**
 src/main/webapp/WEB-INF/dbValidations.json
+src/main/webapp/WEB-INF/prefabs/*/build/**

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
+<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:component-scan base-package="com.hrdb.controller,com.hrdb.service,com.hrdb.dao"/>
     <bean class="com.wavemaker.runtime.data.spring.WMPropertyPlaceholderConfigurer">
@@ -39,10 +38,11 @@
 
     <bean id="hrdbEntityInterceptor" class="com.wavemaker.runtime.data.interceptors.WMEntityInterceptor"/>
 
-    <bean id="hrdbSessionFactory" class="com.wavemaker.runtime.data.factory.TypeResolverSessionFactoryBean">
+    <bean id="hrdbSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="dataSource" ref="hrdbDataSource"/>
         <property name="packagesToScan" value="com.hrdb"/>
         <property name="entityInterceptor" ref="hrdbEntityInterceptor"/>
+        <property name="entityTypeFilters" ref="nonHistoryEntitiesFilter"/>
         <property name="mappingResources">
             <list>
                 <value>
@@ -51,19 +51,33 @@
             </list>
         </property>
 
-        <property name="customTypes">
-            <array value-type="com.wavemaker.runtime.data.CustomType">
-                <ref bean="dateTimeCustomType"/>
-            </array>
-        </property>
-        <property name="hibernateProperties">
+        <property name="hibernateProperties" ref="hrdbHibernateProperties"/>
+    </bean>
+    <bean id="hrdbTransactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hrdbSessionFactory"/>
+        <property name="defaultTimeout" value="${hrdb.transactionTimeout}"/>
+    </bean>
+    <bean id="hrdbTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="hrdbSessionFactory"/>
+    </bean>
+
+    <bean id="hrdbWMQueryExecutor" class="com.wavemaker.runtime.data.dao.query.WMQueryExecutorImpl">
+        <property name="template" ref="hrdbTemplate"/>
+    </bean>
+    <bean id="hrdbWMProcedureExecutor" class="com.wavemaker.runtime.data.dao.procedure.WMProcedureExecutorImpl">
+        <property name="template" ref="hrdbTemplate"/>
+        <property name="serviceId" value="hrdb"/>
+    </bean>
+
+    <bean id="hrdbHibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
             <props>
                 <prop key="hibernate.dialect">
                 ${hrdb.dialect}
                 </prop>
-                <prop key="hibernate.default_schema">
-                ${hrdb.schemaName}
-                </prop>
+                    <prop key="hibernate.default_schema">
+                    ${hrdb.schemaName}
+                    </prop>
                 <prop key="hibernate.show_sql">
                     false
                 </prop>
@@ -82,31 +96,7 @@
             </props>
         </property>
     </bean>
-    <bean id="hrdbTransactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-        <property name="sessionFactory" ref="hrdbSessionFactory"/>
-        <property name="defaultTimeout" value="${hrdb.transactionTimeout}"/>
-    </bean>
-    <bean id="hrdbTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
-        <property name="sessionFactory" ref="hrdbSessionFactory"/>
-    </bean>
-    <bean id="hrdbWMQueryExecutor" class="com.wavemaker.runtime.data.dao.query.WMQueryExecutorImpl">
-        <property name="template" ref="hrdbTemplate"/>
-    </bean>
-    <bean id="hrdbWMProcedureExecutor" class="com.wavemaker.runtime.data.dao.procedure.WMProcedureExecutorImpl">
-        <property name="template" ref="hrdbTemplate"/>
-        <property name="serviceId" value="hrdb" />
-    </bean>
 
-    <bean id="persistentLocalDateTimeType" class="com.wavemaker.commons.data.type.WMPersistentLocalDateTime"/>
-    <bean id="dateTimeCustomType" class="com.wavemaker.runtime.data.CustomType">
-        <property name="type" ref="persistentLocalDateTimeType"/>
-        <property name="keys">
-            <list>
-                <value>DateTime</value>
-                <value>org.joda.time.LocalDateTime</value>
-            </list>
-        </property>
-    </bean>
     <bean id="hrdbPageableHandlerMethodResolver" class="com.wavemaker.runtime.resolver.WMPageableHandlerMethodArgumentResolver" >
         <property name="pageParameterName" value="page"/>
         <property name="sizeParameterName" value="size"/>

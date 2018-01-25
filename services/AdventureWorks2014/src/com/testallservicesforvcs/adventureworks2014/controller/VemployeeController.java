@@ -53,9 +53,9 @@ public class VemployeeController {
 	private VemployeeService vemployeeService;
 
 	@ApiOperation(value = "Creates a new Vemployee instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Vemployee createVemployee(@RequestBody Vemployee vemployee) {
+    public Vemployee createVemployee(@RequestBody Vemployee vemployee) {
 		LOGGER.debug("Create Vemployee with information: {}" , vemployee);
 
 		vemployee = vemployeeService.create(vemployee);

@@ -115,6 +115,7 @@ public class Vacation implements Serializable {
         this.employee = employee;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

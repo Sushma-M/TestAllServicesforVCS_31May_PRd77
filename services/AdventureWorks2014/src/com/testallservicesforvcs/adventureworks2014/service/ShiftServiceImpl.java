@@ -59,15 +59,7 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
 	public Shift create(Shift shift) {
         LOGGER.debug("Creating a new Shift with information: {}", shift);
-        Shift shiftCreated = this.wmGenericDao.create(shift);
-        if(shiftCreated.getEmployeeDepartmentHistories() != null) {
-            for(EmployeeDepartmentHistory employeeDepartmentHistorie : shiftCreated.getEmployeeDepartmentHistories()) {
-                employeeDepartmentHistorie.setShift(shiftCreated);
-                LOGGER.debug("Creating a new child EmployeeDepartmentHistory with information: {}", employeeDepartmentHistorie);
-                employeeDepartmentHistoryService.create(employeeDepartmentHistorie);
-            }
-        }
-        return shiftCreated;
+        return this.wmGenericDao.create(shift);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -128,6 +120,13 @@ public class ShiftServiceImpl implements ShiftService {
 	@Override
 	public Shift update(Shift shift) throws EntityNotFoundException {
         LOGGER.debug("Updating Shift with information: {}", shift);
+
+        if(shift.getEmployeeDepartmentHistories() != null) {
+            for(EmployeeDepartmentHistory _employeeDepartmentHistory : shift.getEmployeeDepartmentHistories()) {
+                _employeeDepartmentHistory.setShift(shift);
+            }
+        }
+
         this.wmGenericDao.update(shift);
 
         Short shiftIdInstance = shift.getShiftId();

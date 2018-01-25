@@ -52,8 +52,7 @@ public class VjobCandidateEmploymentServiceImpl implements VjobCandidateEmployme
     @Override
 	public VjobCandidateEmployment create(VjobCandidateEmployment vjobCandidateEmployment) {
         LOGGER.debug("Creating a new VjobCandidateEmployment with information: {}", vjobCandidateEmployment);
-        VjobCandidateEmployment vjobCandidateEmploymentCreated = this.wmGenericDao.create(vjobCandidateEmployment);
-        return vjobCandidateEmploymentCreated;
+        return this.wmGenericDao.create(vjobCandidateEmployment);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -80,6 +79,8 @@ public class VjobCandidateEmploymentServiceImpl implements VjobCandidateEmployme
 	@Override
 	public VjobCandidateEmployment update(VjobCandidateEmployment vjobCandidateEmployment) throws EntityNotFoundException {
         LOGGER.debug("Updating VjobCandidateEmployment with information: {}", vjobCandidateEmployment);
+
+
         this.wmGenericDao.update(vjobCandidateEmployment);
 
         VjobCandidateEmploymentId vjobcandidateemploymentId = new VjobCandidateEmploymentId();

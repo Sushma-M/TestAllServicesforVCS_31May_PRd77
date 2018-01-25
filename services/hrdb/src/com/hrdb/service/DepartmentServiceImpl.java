@@ -58,15 +58,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
 	public Department create(Department department) {
         LOGGER.debug("Creating a new Department with information: {}", department);
-        Department departmentCreated = this.wmGenericDao.create(department);
-        if(departmentCreated.getEmployees() != null) {
-            for(Employee employee : departmentCreated.getEmployees()) {
-                employee.setDepartment(departmentCreated);
-                LOGGER.debug("Creating a new child Employee with information: {}", employee);
-                employeeService.create(employee);
-            }
-        }
-        return departmentCreated;
+        return this.wmGenericDao.create(department);
     }
 
 	@Transactional(readOnly = true, value = "hrdbTransactionManager")
@@ -109,6 +101,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 	@Override
 	public Department update(Department department) throws EntityNotFoundException {
         LOGGER.debug("Updating Department with information: {}", department);
+
+        if(department.getEmployees() != null) {
+            for(Employee _employee : department.getEmployees()) {
+                _employee.setDepartment(department);
+            }
+        }
+
         this.wmGenericDao.update(department);
 
         Integer departmentId = department.getDeptId();

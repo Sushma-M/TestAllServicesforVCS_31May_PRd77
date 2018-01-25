@@ -65,9 +65,9 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@ApiOperation(value = "Creates a new Employee instance.")
-@RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Employee createEmployee(@RequestPart("wm_data_json") Employee employee, @RequestPart(value = "organizationNode", required = false) MultipartFile _organizationNode) {
+    public Employee createEmployee(@RequestPart("wm_data_json") Employee employee, @RequestPart(value = "organizationNode", required = false) MultipartFile _organizationNode) {
 		LOGGER.debug("Create Employee with information: {}" , employee);
 
     employee.setOrganizationNode(WMMultipartUtils.toByteArray(_organizationNode));

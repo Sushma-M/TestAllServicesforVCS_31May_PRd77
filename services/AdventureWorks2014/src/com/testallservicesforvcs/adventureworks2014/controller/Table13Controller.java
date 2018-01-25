@@ -52,9 +52,9 @@ public class Table13Controller {
 	private Table13Service table13Service;
 
 	@ApiOperation(value = "Creates a new Table13 instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Table13 createTable13(@RequestBody Table13 table13) {
+    public Table13 createTable13(@RequestBody Table13 table13) {
 		LOGGER.debug("Create Table13 with information: {}" , table13);
 
 		table13 = table13Service.create(table13);

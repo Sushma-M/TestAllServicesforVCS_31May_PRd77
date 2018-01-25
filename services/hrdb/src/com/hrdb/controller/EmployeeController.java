@@ -53,9 +53,9 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@ApiOperation(value = "Creates a new Employee instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Employee createEmployee(@RequestBody Employee employee) {
+    public Employee createEmployee(@RequestBody Employee employee) {
 		LOGGER.debug("Create Employee with information: {}" , employee);
 
 		employee = employeeService.create(employee);

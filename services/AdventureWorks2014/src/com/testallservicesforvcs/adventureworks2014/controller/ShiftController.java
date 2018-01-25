@@ -54,9 +54,9 @@ public class ShiftController {
 	private ShiftService shiftService;
 
 	@ApiOperation(value = "Creates a new Shift instance.")
-@RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-public Shift createShift(@RequestBody Shift shift) {
+    public Shift createShift(@RequestBody Shift shift) {
 		LOGGER.debug("Create Shift with information: {}" , shift);
 
 		shift = shiftService.create(shift);

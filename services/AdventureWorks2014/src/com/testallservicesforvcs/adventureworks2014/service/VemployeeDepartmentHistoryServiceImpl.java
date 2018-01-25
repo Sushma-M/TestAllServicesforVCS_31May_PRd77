@@ -52,8 +52,7 @@ public class VemployeeDepartmentHistoryServiceImpl implements VemployeeDepartmen
     @Override
 	public VemployeeDepartmentHistory create(VemployeeDepartmentHistory vemployeeDepartmentHistory) {
         LOGGER.debug("Creating a new VemployeeDepartmentHistory with information: {}", vemployeeDepartmentHistory);
-        VemployeeDepartmentHistory vemployeeDepartmentHistoryCreated = this.wmGenericDao.create(vemployeeDepartmentHistory);
-        return vemployeeDepartmentHistoryCreated;
+        return this.wmGenericDao.create(vemployeeDepartmentHistory);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -80,6 +79,8 @@ public class VemployeeDepartmentHistoryServiceImpl implements VemployeeDepartmen
 	@Override
 	public VemployeeDepartmentHistory update(VemployeeDepartmentHistory vemployeeDepartmentHistory) throws EntityNotFoundException {
         LOGGER.debug("Updating VemployeeDepartmentHistory with information: {}", vemployeeDepartmentHistory);
+
+
         this.wmGenericDao.update(vemployeeDepartmentHistory);
 
         VemployeeDepartmentHistoryId vemployeedepartmenthistoryId = new VemployeeDepartmentHistoryId();

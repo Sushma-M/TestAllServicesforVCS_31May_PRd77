@@ -52,8 +52,7 @@ public class VemployeeServiceImpl implements VemployeeService {
     @Override
 	public Vemployee create(Vemployee vemployee) {
         LOGGER.debug("Creating a new Vemployee with information: {}", vemployee);
-        Vemployee vemployeeCreated = this.wmGenericDao.create(vemployee);
-        return vemployeeCreated;
+        return this.wmGenericDao.create(vemployee);
     }
 
 	@Transactional(readOnly = true, value = "AdventureWorks2014TransactionManager")
@@ -80,6 +79,8 @@ public class VemployeeServiceImpl implements VemployeeService {
 	@Override
 	public Vemployee update(Vemployee vemployee) throws EntityNotFoundException {
         LOGGER.debug("Updating Vemployee with information: {}", vemployee);
+
+
         this.wmGenericDao.update(vemployee);
 
         VemployeeId vemployeeId = new VemployeeId();
